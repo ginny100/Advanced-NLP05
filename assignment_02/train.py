@@ -73,15 +73,19 @@ class Trainer:
             self.ctx = nullcontext()
         else:
             # TODO Otherwise, use 'torch.amp.autocast' context with the specified dtype, and initialize GradScaler if mixed_precision_dtype is float16.
-            self.ctx = None ### YOUR CODE HERE ###
-            self.gradscaler = None ### YOUR CODE HERE ###
+            self.ctx = torch.cuda.amp.autocast(dtype=mixed_precision_dtype) ### YOUR CODE HERE ###
+            self.gradscaler = torch.cuda.amp.GradScaler() ### YOUR CODE HERE ###
 
 
     def _set_ddp_training(self):
         # TODO: Initialize the DistributedDataParallel wrapper for the model.
         # You would need to pass the model and specify the device IDs
         # and output device for the data parallelism.
-        self.model = None ### YOUR CODE HERE ###        
+        self.model = DDP(
+            self.model,
+            device_ids=[self.gpu_id],
+            output_device=self.gpu_id
+        ) ### YOUR CODE HERE ###
 
 
     def _run_batch(self, batch):
